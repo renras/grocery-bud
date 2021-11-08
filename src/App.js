@@ -9,7 +9,7 @@ function App() {
   const [isCleared, setIsCleared] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isValueChanged, setIsValueChanged] = useState(true);
+  const [isValueChanged, setIsValueChanged] = useState(false);
 
   const handleFormSubmit = (e) => {
     if (!isEditing) {
