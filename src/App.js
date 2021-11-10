@@ -1,108 +1,87 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useReducer } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Modal from "./Modal";
+import { reducer } from "./state";
+import { defaultState } from "./state";
 
 function App() {
-  const [groceryItem, setGroceryItem] = useState("");
-  const [groceryList, setGroceryList] = useState([]);
-  const [groceryItemIndex, setGroceryItemIndex] = useState(null);
-  const [isCleared, setIsCleared] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isValueChanged, setIsValueChanged] = useState(false);
+  const modal = useRef(null);
+  const [state, dispatch] = useReducer(reducer, defaultState);
 
   const handleFormSubmit = (e) => {
-    if (!isEditing) {
-      e.preventDefault();
-      setGroceryList([...groceryList, groceryItem]);
-      setIsCleared(false);
-      setIsAdded(true);
-      setIsValueChanged(false);
+    e.preventDefault();
+    if (state.groceryItem && !state.isEditing) {
+      const newItem = {
+        id: new Date().getTime().toString(),
+        name: state.groceryItem,
+      };
+      dispatch({ type: "ADD_ITEM", payload: newItem });
+    } else if (state.groceryItem && state.isEditing) {
+      dispatch({ type: "EDIT_ITEM" });
     } else {
-      e.preventDefault();
-      const newGroceryList = groceryList.map((grocery, index) => {
-        if (index === groceryItemIndex) {
-          grocery = groceryItem;
-        }
-        return grocery;
-      });
-      setIsValueChanged(true);
-      setIsAdded(false);
-      setIsCleared(false);
-      setGroceryList(newGroceryList);
-      setIsEditing(false);
+      dispatch({ type: "NO_VALUE" });
     }
-    setGroceryItem("");
-  };
-
-  const handleClearItemsClick = () => {
-    setGroceryList([]);
-    setIsAdded(false);
-    setIsCleared(true);
-    setIsValueChanged(false);
-  };
-
-  const editGrocery = (index) => {
-    setIsEditing(true);
-    const newGrocery = groceryList.map((grocery, i) => {
-      if (i === index) {
-        setGroceryItem(grocery);
-        setGroceryItemIndex(index);
-      }
-      return grocery;
-    });
-    setGroceryList(newGrocery);
-  };
-
-  const deleteGrocery = (index) => {
-    let newGroceryList = groceryList.filter((grocery, i) => {
-      return i !== index;
-    });
-    setGroceryList(newGroceryList);
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsCleared(false);
-      setIsAdded(false);
-      setIsValueChanged(false);
-    }, 3000);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [isCleared, isAdded, isValueChanged]);
+    try {
+      if (
+        state.modalContent === "item removed" ||
+        state.modalContent === "items cleared"
+      ) {
+        modal.current.style.backgroundColor = "#ff9999";
+      } else {
+        modal.current.style.backgroundColor = "#e9fce9";
+      }
+    } catch (error) {}
+  });
+
+  const closeModal = () => {
+    dispatch({ type: "CLOSE_MODAL" });
+  };
 
   return (
     <main>
-      {isAdded && <p className="alertForAddList">Item Added To The List</p>}
-      {isCleared && <p className="alertForEmptyList">Empty List</p>}
-      {isValueChanged && <p className="alertForValueChanged">Value Changed</p>}
+      {state.isModalOpen && (
+        <Modal
+          closeModal={closeModal}
+          modal={modal}
+          modalContent={state.modalContent}
+        />
+      )}
       <h1>Grocery Bud</h1>
       <form onSubmit={handleFormSubmit}>
         <input
           type="text"
           name="groceryItem"
           id="groceryItem"
-          value={groceryItem}
-          onChange={(e) => setGroceryItem(e.target.value)}
+          value={state.groceryItem}
+          onChange={(e) =>
+            dispatch({ type: "INPUT_ON_CHANGE", payload: e.target.value })
+          }
           placeholder="e.g. eggs"
         />
-        <button type="submit">{isEditing ? "Edit" : "Submit"}</button>
+        <button type="submit">{state.isEditing ? "edit" : "submit"}</button>
       </form>
       <section>
-        {groceryList.map((groceryItem, index) => {
+        {state.groceryList.map((groceryItem) => {
           return (
-            <div className="groceryItem" key={index}>
-              <p>{groceryItem}</p>
+            <div className="groceryItem" key={groceryItem.id}>
+              <p>{groceryItem.name}</p>
               <span>
                 <FontAwesomeIcon
                   className="editIcon"
-                  onClick={() => editGrocery(index)}
+                  onClick={() =>
+                    dispatch({ type: "EDITING_MODE", payload: groceryItem })
+                  }
                   icon={faEdit}
                 />
                 <FontAwesomeIcon
                   className="trashIcon"
-                  onClick={() => deleteGrocery(index)}
+                  onClick={() =>
+                    dispatch({ type: "REMOVE_ITEM", payload: groceryItem.id })
+                  }
                   icon={faTrash}
                 />
               </span>
@@ -110,8 +89,11 @@ function App() {
           );
         })}
       </section>
-      {groceryList.length > 0 && (
-        <button className="clearItemsButton" onClick={handleClearItemsClick}>
+      {state.groceryList.length > 0 && (
+        <button
+          className="clearItemsButton"
+          onClick={() => dispatch({ type: "CLEAR_ITEMS" })}
+        >
           Clear Items
         </button>
       )}
