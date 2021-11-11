@@ -1,39 +1,37 @@
-import React, { useEffect, useRef, useReducer } from "react";
+import React, { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from "./Modal";
-import { reducer } from "./state";
-import { defaultState } from "./state";
+import { useSelector, useDispatch } from "react-redux";
+import { groceryActions } from "./store/groceryReducer";
 
 function App() {
+  const dispatch = useDispatch();
   const modal = useRef(null);
-  const [state, dispatch] = useReducer(reducer, defaultState);
+  const groceryItem = useSelector((state) => state.grocery.groceryItem);
+  const isEditing = useSelector((state) => state.grocery.isEditing);
+  const modalContent = useSelector((state) => state.grocery.modalContent);
+  const isModalOpen = useSelector((state) => state.grocery.isModalOpen);
+  const groceryList = useSelector((state) => state.grocery.groceryList);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (state.groceryItem && !state.isEditing) {
+    if (groceryItem && !isEditing) {
       const newItem = {
         id: new Date().getTime().toString(),
-        name: state.groceryItem,
+        name: groceryItem,
       };
-      dispatch({ type: "ADD_ITEM", payload: newItem });
-    } else if (state.groceryItem && state.isEditing) {
-      dispatch({ type: "EDIT_ITEM" });
+      dispatch(groceryActions.addItem(newItem));
+    } else if (groceryItem && isEditing) {
+      dispatch(groceryActions.editItem());
     } else {
-      dispatch({ type: "NO_VALUE" });
+      dispatch(groceryActions.noValue());
     }
   };
 
   useEffect(() => {
-    localStorage.setItem("groceryList", JSON.stringify(state.groceryList));
-  }, [state.groceryList]);
-
-  useEffect(() => {
     try {
-      if (
-        state.modalContent === "item removed" ||
-        state.modalContent === "items cleared"
-      ) {
+      if (modalContent === "item removed" || modalContent === "items cleared") {
         modal.current.style.backgroundColor = "#ff9999";
       } else {
         modal.current.style.backgroundColor = "#e9fce9";
@@ -42,16 +40,16 @@ function App() {
   });
 
   const closeModal = () => {
-    dispatch({ type: "CLOSE_MODAL" });
+    dispatch(groceryActions.closeModal());
   };
 
   return (
     <main>
-      {state.isModalOpen && (
+      {isModalOpen && (
         <Modal
           closeModal={closeModal}
           modal={modal}
-          modalContent={state.modalContent}
+          modalContent={modalContent}
         />
       )}
       <h1>Grocery Bud</h1>
@@ -60,16 +58,16 @@ function App() {
           type="text"
           name="groceryItem"
           id="groceryItem"
-          value={state.groceryItem}
+          value={groceryItem}
           onChange={(e) =>
-            dispatch({ type: "INPUT_ON_CHANGE", payload: e.target.value })
+            dispatch(groceryActions.inputOnChange(e.target.value))
           }
           placeholder="e.g. eggs"
         />
-        <button type="submit">{state.isEditing ? "edit" : "submit"}</button>
+        <button type="submit">{isEditing ? "edit" : "submit"}</button>
       </form>
       <section>
-        {state.groceryList.map((groceryItem) => {
+        {groceryList.map((groceryItem) => {
           return (
             <div className="groceryItem" key={groceryItem.id}>
               <p>{groceryItem.name}</p>
@@ -77,14 +75,14 @@ function App() {
                 <FontAwesomeIcon
                   className="editIcon"
                   onClick={() =>
-                    dispatch({ type: "EDITING_MODE", payload: groceryItem })
+                    dispatch(groceryActions.editingMode(groceryItem))
                   }
                   icon={faEdit}
                 />
                 <FontAwesomeIcon
                   className="trashIcon"
                   onClick={() =>
-                    dispatch({ type: "REMOVE_ITEM", payload: groceryItem.id })
+                    dispatch(groceryActions.removeItem(groceryItem.id))
                   }
                   icon={faTrash}
                 />
@@ -93,10 +91,10 @@ function App() {
           );
         })}
       </section>
-      {state.groceryList.length > 0 && (
+      {groceryList.length > 0 && (
         <button
           className="clearItemsButton"
-          onClick={() => dispatch({ type: "CLEAR_ITEMS" })}
+          onClick={() => dispatch(groceryActions.clearItems())}
         >
           Clear Items
         </button>
