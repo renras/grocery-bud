@@ -1,3 +1,13 @@
+const getLocalStorage = () => {
+  console.log("hello");
+  let list = localStorage.getItem("groceryList");
+  if (list) {
+    return JSON.parse(localStorage.getItem("groceryList"));
+  } else {
+    return [];
+  }
+};
+
 export const reducer = (state, action) => {
   if (action.type === "ADD_ITEM") {
     const newGroceryList = [...state.groceryList, action.payload];
@@ -68,7 +78,7 @@ export const reducer = (state, action) => {
 };
 
 export const defaultState = {
-  groceryList: [],
+  groceryList: getLocalStorage(),
   isModalOpen: false,
   modalContent: "",
   isEditing: false,

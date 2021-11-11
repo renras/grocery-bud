@@ -25,6 +25,10 @@ function App() {
   };
 
   useEffect(() => {
+    localStorage.setItem("groceryList", JSON.stringify(state.groceryList));
+  }, [state.groceryList]);
+
+  useEffect(() => {
     try {
       if (
         state.modalContent === "item removed" ||
