@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/grocery-bud/static/css/main.8674e5c1.chunk.css",
-    "main.js": "/grocery-bud/static/js/main.cc0eae37.chunk.js",
-    "main.js.map": "/grocery-bud/static/js/main.cc0eae37.chunk.js.map",
+    "main.js": "/grocery-bud/static/js/main.b61b5de1.chunk.js",
+    "main.js.map": "/grocery-bud/static/js/main.b61b5de1.chunk.js.map",
     "runtime-main.js": "/grocery-bud/static/js/runtime-main.ea5ed197.js",
     "runtime-main.js.map": "/grocery-bud/static/js/runtime-main.ea5ed197.js.map",
-    "static/js/2.03443908.chunk.js": "/grocery-bud/static/js/2.03443908.chunk.js",
-    "static/js/2.03443908.chunk.js.map": "/grocery-bud/static/js/2.03443908.chunk.js.map",
+    "static/js/2.a3e5d61d.chunk.js": "/grocery-bud/static/js/2.a3e5d61d.chunk.js",
+    "static/js/2.a3e5d61d.chunk.js.map": "/grocery-bud/static/js/2.a3e5d61d.chunk.js.map",
     "index.html": "/grocery-bud/index.html",
     "static/css/main.8674e5c1.chunk.css.map": "/grocery-bud/static/css/main.8674e5c1.chunk.css.map",
-    "static/js/2.03443908.chunk.js.LICENSE.txt": "/grocery-bud/static/js/2.03443908.chunk.js.LICENSE.txt"
+    "static/js/2.a3e5d61d.chunk.js.LICENSE.txt": "/grocery-bud/static/js/2.a3e5d61d.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.ea5ed197.js",
-    "static/js/2.03443908.chunk.js",
+    "static/js/2.a3e5d61d.chunk.js",
     "static/css/main.8674e5c1.chunk.css",
-    "static/js/main.cc0eae37.chunk.js"
+    "static/js/main.b61b5de1.chunk.js"
   ]
 }
